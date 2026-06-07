@@ -420,7 +420,7 @@ function VirtualTour() {
 
           {/* Schedule visit button */}
           <motion.a
-            href="#contact"
+            href="#free-trial"
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -461,7 +461,7 @@ function VirtualTour() {
                 <p className="text-white font-bold text-xl">Virtual Tour Coming Soon</p>
                 <p className="text-gray-400 text-sm">Book an in-person tour for the full experience</p>
                 <a
-                  href="#contact"
+                  href="#free-trial"
                   onClick={() => setPlaying(false)}
                   className="mt-3 inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-7 py-3.5 rounded-xl transition-all duration-200"
                 >
@@ -629,7 +629,7 @@ export default function Gallery() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
               <a
-                href="#contact"
+                href="#free-trial"
                 className="group inline-flex items-center justify-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-8 py-4 rounded-xl transition-all duration-200 hover:shadow-xl hover:shadow-[#E63946]/40 hover:-translate-y-0.5 active:scale-95"
               >
                 Schedule A Visit
@@ -638,7 +638,7 @@ export default function Gallery() {
                 </svg>
               </a>
               <a
-                href="#contact"
+                href="#free-trial"
                 className="inline-flex items-center justify-center gap-2 bg-white/8 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/40 text-white font-bold text-sm px-8 py-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
               >
                 Start Free Trial

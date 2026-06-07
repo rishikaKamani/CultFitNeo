@@ -17,8 +17,8 @@ const sectionIds = ['home','about','facilities','trainers','programs','membershi
 const labelBySection = {
   home: 'Home', about: 'About', facilities: 'Facilities',
   trainers: 'Trainers', programs: 'Programs', memberships: 'Memberships',
-  transformations: 'Memberships', gallery: 'Memberships',
-  testimonials: 'Memberships', 'free-trial': 'Memberships', contact: 'Contact',
+  transformations: 'Programs', gallery: 'Programs',
+  testimonials: 'About', 'free-trial': 'Memberships', contact: 'Contact',
 }
 
 export default function Navbar() {

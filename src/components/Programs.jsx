@@ -155,6 +155,21 @@ function useCounter(target, started, duration = 1800) {
 }
 
 /* ─────────────────────────────────────────
+   CHALLENGE STAT ITEM (extracted to avoid hook-in-loop)
+───────────────────────────────────────── */
+function ChallengeStatItem({ stat, index, inView }) {
+  const count = useCounter(stat.value, inView, 1600 + index * 150)
+  return (
+    <div className="bg-white/4 border border-white/8 rounded-xl p-4 text-center">
+      <p className="text-2xl font-black text-[#E63946]">
+        {count.toLocaleString()}{stat.suffix}
+      </p>
+      <p className="text-[10px] text-gray-400 uppercase tracking-wide mt-1">{stat.label}</p>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
    PROGRAM CARD
 ───────────────────────────────────────── */
 const cardVariants = {
@@ -284,10 +299,10 @@ function ClassSchedule() {
           <button
             key={day}
             onClick={() => setActiveDay(day)}
-            className={`relative flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-250
+            className={`relative flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-250 z-10
               ${activeDay === day
-                ? 'bg-[#E63946] text-white shadow-lg shadow-[#E63946]/25'
-                : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:border-white/25'
+                ? 'border-transparent text-white'
+                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/25'
               }`}
           >
             {day.slice(0, 3)}
@@ -454,7 +469,11 @@ function ChallengeSpotlight() {
             </div>
 
             <a
-              href="#contact"
+              href="#free-trial"
+              onClick={() => {
+                sessionStorage.setItem('selectedPlan', 'Transformation')
+                window.dispatchEvent(new Event('selectedPlanChanged'))
+              }}
               className="self-start inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-7 py-3.5 rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#E63946]/30 hover:-translate-y-0.5 active:scale-95"
             >
               Apply For The Challenge
@@ -504,7 +523,7 @@ function ProgramsCTA() {
         </div>
         <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
           <a
-            href="#contact"
+            href="#free-trial"
             className="group inline-flex items-center justify-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-8 py-4 rounded-xl transition-all duration-200 hover:shadow-xl hover:shadow-[#E63946]/40 hover:-translate-y-0.5 active:scale-95"
           >
             Book A Free Trial

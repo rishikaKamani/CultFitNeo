@@ -179,7 +179,7 @@ export default function About() {
               className="flex items-center gap-6 pt-2"
             >
               <a
-                href="#contact"
+                href="#free-trial"
                 className="inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-7 py-3.5 rounded transition-all duration-200 hover:shadow-lg hover:shadow-[#E63946]/30 hover:-translate-y-0.5 active:scale-95"
               >
                 Start Your Journey

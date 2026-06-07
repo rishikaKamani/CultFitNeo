@@ -1,5 +1,5 @@
-import React, { useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import React, { useRef, useState, useEffect } from 'react'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 
 /* ─────────────────────────────────────────
    DATA
@@ -224,7 +224,7 @@ function TrainerCard({ trainer, index }) {
 /* ─────────────────────────────────────────
    FEATURED TRAINER SPOTLIGHT
 ───────────────────────────────────────── */
-function FeaturedTrainer() {
+function FeaturedTrainer({ onBook }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
@@ -330,15 +330,15 @@ function FeaturedTrainer() {
             </div>
 
             {/* CTA */}
-            <a
-              href="#contact"
+            <button
+              onClick={() => onBook('Rahul Verma')}
               className="self-start inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-7 py-3.5 rounded transition-all duration-200 hover:shadow-lg hover:shadow-[#E63946]/30 hover:-translate-y-0.5 active:scale-95"
             >
               Train With Rahul
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
-            </a>
+            </button>
           </motion.div>
         </div>
       </div>
@@ -349,7 +349,7 @@ function FeaturedTrainer() {
 /* ─────────────────────────────────────────
    CTA BANNER
 ───────────────────────────────────────── */
-function TrainerCTA() {
+function TrainerCTA({ onBook }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -383,15 +383,15 @@ function TrainerCTA() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
-          <a
-            href="#contact"
+          <button
+            onClick={() => onBook('General Consultation')}
             className="group inline-flex items-center justify-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-8 py-4 rounded transition-all duration-200 hover:shadow-xl hover:shadow-[#E63946]/40 hover:-translate-y-0.5 active:scale-95"
           >
             Book A Consultation
             <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
-          </a>
+          </button>
           <a
             href="#trainers"
             className="inline-flex items-center justify-center gap-2 bg-white/8 backdrop-blur-sm hover:bg-white/15 border border-white/20 hover:border-white/40 text-white font-bold text-sm px-8 py-4 rounded transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
@@ -408,6 +408,14 @@ function TrainerCTA() {
    MAIN SECTION
 ───────────────────────────────────────── */
 export default function Trainers() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [preselectedTrainer, setPreselectedTrainer] = useState('General Consultation')
+
+  const openModal = (trainerName) => {
+    setPreselectedTrainer(trainerName || 'General Consultation')
+    setIsModalOpen(true)
+  }
+
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
 
@@ -475,14 +483,306 @@ export default function Trainers() {
         </div>
 
         {/* ── Featured Spotlight ── */}
-        <FeaturedTrainer />
+        <FeaturedTrainer onBook={openModal} />
 
         {/* ── CTA ── */}
-        <TrainerCTA />
+        <TrainerCTA onBook={openModal} />
       </div>
 
       {/* Bottom border */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+      {/* Consultation Modal */}
+      <ConsultationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        preselectedTrainer={preselectedTrainer}
+        trainersList={trainers}
+      />
     </section>
+  )
+}
+
+/* ─────────────────────────────────────────
+   FLOATING LABEL INPUT (Modal Helper)
+───────────────────────────────────────── */
+function FloatingInput({ id, label, type = 'text', value, onChange, error, required, ...rest }) {
+  const [focused, setFocused] = useState(false)
+  const filled = value && value.length > 0
+  const active = focused || filled
+
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        required={required}
+        className={`peer w-full bg-white/5 border rounded-xl px-4 pt-6 pb-2.5 text-sm text-white placeholder-transparent
+          outline-none transition-all duration-200
+          ${error
+            ? 'border-red-500/60 focus:border-red-500'
+            : focused
+              ? 'border-[#E63946]/60 shadow-[0_0_0_3px_rgba(230,57,70,0.08)]'
+              : 'border-white/12 hover:border-white/25'
+          }`}
+        placeholder={label}
+        {...rest}
+      />
+      <label
+        htmlFor={id}
+        className={`absolute left-4 transition-all duration-200 pointer-events-none font-medium
+          ${active ? 'top-2 text-[10px] text-[#E63946]' : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'}`}
+      >
+        {label}{required && ' *'}
+      </label>
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-1.5 text-red-400 text-xs flex items-center gap-1"
+        >
+          <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </motion.p>
+      )}
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
+   FLOATING LABEL SELECT (Modal Helper)
+───────────────────────────────────────── */
+function FloatingSelect({ id, label, value, onChange, error, options, required }) {
+  const [focused, setFocused] = useState(false)
+  const filled = value && value.length > 0
+  const active = focused || filled
+
+  return (
+    <div className="relative">
+      <select
+        id={id}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        required={required}
+        className={`peer w-full bg-white/5 border rounded-xl px-4 pt-6 pb-2.5 text-sm text-white
+          outline-none transition-all duration-200 appearance-none cursor-pointer
+          ${error
+            ? 'border-red-500/60 focus:border-red-500'
+            : focused
+              ? 'border-[#E63946]/60 shadow-[0_0_0_3px_rgba(230,57,70,0.08)]'
+              : 'border-white/12 hover:border-white/25'
+          }`}
+        style={{ background: 'rgba(255,255,255,0.05)' }}
+      >
+        <option value="" disabled style={{ background: '#1A1A1A' }}></option>
+        {options.map(o => (
+          <option key={o} value={o} style={{ background: '#1A1A1A', color: '#fff' }}>{o}</option>
+        ))}
+      </select>
+      <label
+        htmlFor={id}
+        className={`absolute left-4 transition-all duration-200 pointer-events-none font-medium
+          ${active ? 'top-2 text-[10px] text-[#E63946]' : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'}`}
+      >
+        {label}{required && ' *'}
+      </label>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </div>
+      {error && (
+        <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-1.5 text-red-400 text-xs flex items-center gap-1">
+          <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </motion.p>
+      )}
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────
+   CONSULTATION BOOKING MODAL
+───────────────────────────────────────── */
+function ConsultationModal({ isOpen, onClose, preselectedTrainer, trainersList }) {
+  const empty = { name: '', phone: '', email: '', trainer: '', time: '', message: '' }
+  const [fields, setFields] = useState(empty)
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setFields({ ...empty, trainer: preselectedTrainer })
+      setErrors({})
+      setSuccess(false)
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [isOpen, preselectedTrainer])
+
+  if (!isOpen) return null
+
+  const trainerOptions = ['General Consultation', ...trainersList.map(t => t.name)]
+  const timeOptions = [
+    '6:00 AM – 8:00 AM', '8:00 AM – 10:00 AM', '10:00 AM – 12:00 PM',
+    '12:00 PM – 3:00 PM', '3:00 PM – 5:00 PM', '5:00 PM – 7:00 PM', '7:00 PM – 9:00 PM',
+  ]
+
+  const validate = (fields) => {
+    const errs = {}
+    if (!fields.name.trim()) errs.name = 'Full name is required'
+    if (!fields.phone.trim()) errs.phone = 'Mobile number is required'
+    else if (!/^[6-9]\d{9}$/.test(fields.phone.trim())) errs.phone = 'Enter a valid 10-digit Indian mobile number'
+    if (!fields.email.trim()) errs.email = 'Email address is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errs.email = 'Enter a valid email address'
+    if (!fields.trainer) errs.trainer = 'Please select a coach'
+    if (!fields.time) errs.time = 'Please select a preferred time'
+    return errs
+  }
+
+  const set = (key) => (e) => {
+    setFields(prev => ({ ...prev, [key]: e.target.value }))
+    if (errors[key]) setErrors(prev => { const n = { ...prev }; delete n[key]; return n })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const errs = validate(fields)
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    setLoading(true)
+    await new Promise(r => setTimeout(r, 1600))
+    setLoading(false)
+    setSuccess(true)
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="relative bg-[#1A1A1A] border border-white/10 rounded-2xl p-7 max-w-lg w-full overflow-hidden max-h-[95vh] overflow-y-auto"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Top red accent */}
+          <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#E63946] via-[#E63946]/60 to-transparent" />
+
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 border border-white/12 flex items-center justify-center text-gray-400 hover:text-white transition-all duration-200"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {!success ? (
+            <>
+              <div className="mb-6">
+                <h3 className="text-white font-black text-2xl">Book a Consultation</h3>
+                <p className="text-gray-500 text-sm mt-1">Fill out the form below to schedule a session with our coaches.</p>
+              </div>
+
+              <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+                <FloatingInput id="modal-name" label="Full Name" value={fields.name} onChange={set('name')} error={errors.name} required />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FloatingInput id="modal-phone" label="Mobile Number" type="tel" value={fields.phone} onChange={set('phone')} error={errors.phone} required />
+                  <FloatingInput id="modal-email" label="Email Address" type="email" value={fields.email} onChange={set('email')} error={errors.email} required />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FloatingSelect id="modal-trainer" label="Preferred Coach" value={fields.trainer} onChange={set('trainer')} error={errors.trainer} options={trainerOptions} required />
+                  <FloatingSelect id="modal-time" label="Preferred Time" value={fields.time} onChange={set('time')} error={errors.time} options={timeOptions} required />
+                </div>
+                <div className="relative">
+                  <textarea
+                    id="modal-message"
+                    value={fields.message}
+                    onChange={set('message')}
+                    rows={3}
+                    placeholder="Message"
+                    className="peer w-full bg-white/5 border border-white/12 hover:border-white/25 focus:border-[#E63946]/60 focus:shadow-[0_0_0_3px_rgba(230,57,70,0.08)] rounded-xl px-4 pt-6 pb-2.5 text-sm text-white placeholder-transparent outline-none transition-all duration-200 resize-none"
+                  />
+                  <label
+                    htmlFor="modal-message"
+                    className={`absolute left-4 transition-all duration-200 pointer-events-none font-medium
+                      ${fields.message ? 'top-2 text-[10px] text-[#E63946]' : 'top-4 text-sm text-gray-500'}`}
+                  >
+                    Message (Optional)
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex items-center justify-center gap-3 font-bold text-sm py-4 px-8 rounded-xl transition-all duration-200
+                    ${loading
+                      ? 'bg-[#E63946]/60 cursor-not-allowed'
+                      : 'bg-[#E63946] hover:bg-[#c62d39] hover:shadow-xl hover:shadow-[#E63946]/35 active:scale-95'
+                    } text-white`}
+                >
+                  {loading ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={4} />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Booking Consultation…
+                    </>
+                  ) : (
+                    <>
+                      Book Session
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="text-center py-6">
+              <div className="w-20 h-20 rounded-full bg-[#E63946]/10 border-2 border-[#E63946]/40 flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-[#E63946]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </div>
+              <h3 className="text-3xl font-black text-white mb-2">Booking Confirmed! 🎉</h3>
+              <p className="text-white font-semibold text-base mb-2">Your consultation is scheduled.</p>
+              <p className="text-gray-400 text-sm mb-8">
+                We have registered your request. A coordinator will contact you shortly to finalize details.
+              </p>
+              <button
+                onClick={onClose}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm py-3.5 px-5 rounded-xl transition-all duration-200"
+              >
+                Close Window
+              </button>
+            </div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   )
 }

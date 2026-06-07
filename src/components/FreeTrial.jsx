@@ -2,15 +2,25 @@ import React, { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 
 /* ─────────────────────────────────────────
-   COUNTDOWN TIMER
+   COUNTDOWN TIMER (persisted via localStorage)
 ───────────────────────────────────────── */
 function useCountdown() {
+  const STORAGE_KEY = 'cultfitneo_trial_deadline'
+
   const getTarget = () => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      const ts = parseInt(stored, 10)
+      if (!isNaN(ts) && ts > Date.now()) return new Date(ts)
+    }
+    // First visit — set deadline 4 days from now
     const t = new Date()
     t.setDate(t.getDate() + 4)
     t.setHours(23, 59, 59, 0)
+    localStorage.setItem(STORAGE_KEY, String(t.getTime()))
     return t
   }
+
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
@@ -317,18 +327,24 @@ function BookingForm() {
 
   // Pre-fill goal from membership card click
   useEffect(() => {
-    const plan = sessionStorage.getItem('selectedPlan')
-    if (plan) {
-      const goalMap = {
-        'Basic': 'General Fitness',
-        'Pro': 'General Fitness',
-        'Elite': 'Weight Loss',
-        'Transformation': 'Weight Loss',
+    const updateGoal = () => {
+      const plan = sessionStorage.getItem('selectedPlan')
+      if (plan) {
+        const goalMap = {
+          'Basic': 'General Fitness',
+          'Pro': 'General Fitness',
+          'Elite': 'Weight Loss',
+          'Transformation': 'Weight Loss',
+        }
+        const goal = goalMap[plan] || ''
+        setFields(prev => ({ ...prev, goal }))
+        sessionStorage.removeItem('selectedPlan')
       }
-      const goal = goalMap[plan] || ''
-      setFields(prev => ({ ...prev, goal }))
-      sessionStorage.removeItem('selectedPlan')
     }
+
+    updateGoal()
+    window.addEventListener('selectedPlanChanged', updateGoal)
+    return () => window.removeEventListener('selectedPlanChanged', updateGoal)
   }, [])
 
   const set = (key) => (e) => {
@@ -376,10 +392,6 @@ function BookingForm() {
             id="message"
             value={fields.message}
             onChange={set('message')}
-            onFocus={e => e.target.parentElement.querySelector('label').classList.add('top-2','text-[10px]','text-[#E63946]')}
-            onBlur={e => {
-              if (!fields.message) e.target.parentElement.querySelector('label').classList.remove('top-2','text-[10px]','text-[#E63946]')
-            }}
             rows={3}
             placeholder="Message"
             className="peer w-full bg-white/5 border border-white/12 hover:border-white/25 focus:border-[#E63946]/60 focus:shadow-[0_0_0_3px_rgba(230,57,70,0.08)] rounded-xl px-4 pt-6 pb-2.5 text-sm text-white placeholder-transparent outline-none transition-all duration-200 resize-none"

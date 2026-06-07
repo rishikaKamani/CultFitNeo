@@ -129,14 +129,17 @@ function FacilityCard({ facility }) {
         </p>
 
         {/* Explore link */}
-        <div className="flex items-center gap-1.5 text-[#E63946] text-sm font-semibold mt-1
-                        opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0
-                        transition-all duration-300">
+        <a
+          href="#free-trial"
+          className="flex items-center gap-1.5 text-[#E63946] text-sm font-semibold mt-1
+                      opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0
+                      transition-all duration-300"
+        >
           <span>Explore</span>
           <svg className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
-        </div>
+        </a>
 
         {/* Bottom red line — slides in on hover */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#E63946] to-[#E63946]/30
@@ -237,7 +240,7 @@ export default function Facilities() {
           className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
-            href="#contact"
+            href="#free-trial"
             className="inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-8 py-4 rounded transition-all duration-200 hover:shadow-xl hover:shadow-[#E63946]/30 hover:-translate-y-0.5 active:scale-95"
           >
             Book a Free Tour

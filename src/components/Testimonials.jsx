@@ -147,7 +147,7 @@ function Stars({ count = 5, size = 'sm' }) {
 ───────────────────────────────────────── */
 function ReviewCard({ review }) {
   return (
-    <div className="group relative flex-shrink-0 w-[340px] bg-white/4 backdrop-blur-sm border border-white/8 rounded-2xl p-6 flex flex-col gap-4 hover:border-[#E63946]/30 hover:bg-[#E63946]/5 hover:-translate-y-1 transition-all duration-300 cursor-default">
+    <div data-card className="group relative flex-shrink-0 w-[340px] bg-white/4 backdrop-blur-sm border border-white/8 rounded-2xl p-6 flex flex-col gap-4 hover:border-[#E63946]/30 hover:bg-[#E63946]/5 hover:-translate-y-1 transition-all duration-300 cursor-default">
       {/* Glassmorphism shimmer */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/5 via-transparent to-transparent rounded-2xl pointer-events-none" />
 
@@ -201,8 +201,25 @@ function TestimonialCarousel() {
   const trackRef = useRef(null)
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [cardWidth, setCardWidth] = useState(365) // 340px card + 25px gap
   const total = reviews.length
-  const visibleCount = 3 // how many scroll per nav step
+
+  // Measure actual card+gap width on mount and resize
+  useEffect(() => {
+    const measure = () => {
+      if (trackRef.current) {
+        const firstCard = trackRef.current.querySelector('[data-card]')
+        if (firstCard) {
+          const style = window.getComputedStyle(firstCard)
+          const marginRight = parseFloat(style.marginRight) || 0
+          setCardWidth(firstCard.offsetWidth + 20 + marginRight) // 20px = gap-5
+        }
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
 
   // Auto-scroll every 3.5s
   useEffect(() => {
@@ -216,9 +233,8 @@ function TestimonialCarousel() {
   const prev = () => setIndex(i => (i - 1 + total) % total)
   const next = () => setIndex(i => (i + 1) % total)
 
-  // Build infinite list: duplicate reviews around current
+  // Build infinite list: duplicate reviews
   const extended = [...reviews, ...reviews, ...reviews]
-  const offset = total // start from middle copy
 
   return (
     <div
@@ -231,7 +247,7 @@ function TestimonialCarousel() {
         <motion.div
           ref={trackRef}
           className="flex gap-5"
-          animate={{ x: -((index % total) * 360) }}
+          animate={{ x: -((index % total) * cardWidth) }}
           transition={{ type: 'spring', stiffness: 220, damping: 30 }}
         >
           {extended.map((review, i) => (
@@ -329,7 +345,9 @@ function GoogleReviews() {
         </p>
 
         <a
-          href="#"
+          href="https://www.google.com/search?q=CultFitNeo+Gym+Hyderabad+reviews"
+          target="_blank"
+          rel="noopener noreferrer"
           className="mt-2 inline-flex items-center gap-1.5 text-[#E63946] text-xs font-semibold hover:underline"
         >
           See all reviews on Google
@@ -514,7 +532,7 @@ function VideoTestimonials() {
               <p className="text-white font-bold text-xl mb-2">{playing}'s Story</p>
               <p className="text-gray-400 text-sm mb-6">Full video testimonial coming soon. Book a tour to meet our members in person.</p>
               <a
-                href="#contact"
+                href="#free-trial"
                 onClick={() => setPlaying(null)}
                 className="inline-flex items-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-7 py-3.5 rounded-xl transition-all duration-200"
               >
@@ -574,7 +592,7 @@ function TestimonialCTA() {
 
         <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
           <a
-            href="#contact"
+            href="#free-trial"
             className="group inline-flex items-center justify-center gap-2 bg-[#E63946] hover:bg-[#c62d39] text-white font-bold text-sm px-8 py-4 rounded-xl transition-all duration-200 hover:shadow-xl hover:shadow-[#E63946]/40 hover:-translate-y-0.5 active:scale-95"
           >
             Start Free Trial

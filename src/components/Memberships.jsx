@@ -262,6 +262,7 @@ function PlanCard({ plan, index, billing }) {
           href={`#free-trial`}
           onClick={() => {
             sessionStorage.setItem('selectedPlan', plan.name)
+            window.dispatchEvent(new Event('selectedPlanChanged'))
           }}
           className={`w-full flex items-center justify-center gap-2 font-bold text-sm py-3.5 px-6 rounded-xl
                       transition-all duration-200 hover:-translate-y-0.5 active:scale-95 mt-auto
@@ -466,7 +467,7 @@ export default function Memberships() {
                 </svg>
               </a>
               <a
-                href="#contact"
+                href="#free-trial"
                 className="inline-flex items-center justify-center gap-2 bg-white/8 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/40 text-white font-bold text-sm px-9 py-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
               >
                 <svg className="w-4 h-4 text-[#E63946]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
